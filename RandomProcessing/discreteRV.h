@@ -3,6 +3,8 @@
 #include <cmath>
 using namespace std;
 
+const double PI = 3.14159265358979323846;
+
 class discreteRV
 {
 public:
@@ -50,7 +52,6 @@ public:
 	
 	void init(int num, double p);
 	double factorial(double N);
-	void calculateExVar();
 	double analyticalBinomial(double n, double k, double p);
 	void experiment(int Ntrial);
 	void calculate();
@@ -72,4 +73,22 @@ public:
 	void experiment(int Ntrial);
 	void calcPoisson();
 	void calcBinomal();
+};
+
+class central : public discreteRV
+{
+public:
+	int max;
+	double mean, sigma;
+	central() {}
+	central(int num, int low, int high)
+	{
+		init(num, low, high);
+		experiment(100000);
+	}
+	void init(int num, int low, int high);
+
+	void experiment(int Ntrial);
+	void gaussianRV();
+	void calculateExVar();
 };

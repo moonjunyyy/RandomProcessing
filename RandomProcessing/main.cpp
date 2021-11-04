@@ -21,7 +21,7 @@ int main()
 	cout << "dice Ex  : " << D.EX << endl;
 	cout << "dice Var : " << D.VAR << endl << endl;
 
-	binomial B(20, 0.01);
+	binomial B(40, 0.01);
 	cout << "Loss Ex  : " << B.EX << endl;
 	cout << "Loss Var : " << B.VAR << endl;
 	cout << "P[x]     : " << endl;
@@ -40,7 +40,7 @@ int main()
 		cout << B.pdf[i] << endl;
 	}
 	cout << endl << endl;
-	
+
 	poisson P(10, 0.1),
 		Q(1E2, 0.1),
 		R(1E3, 0.1);
@@ -147,6 +147,23 @@ int main()
 	}
 	fio << endl;
 	fio.close();
+
+
+	central DC(5, 1, 6);
+	DC.experiment(100000);
+	cout << DC.N << ", " << DC.xhigh << endl;
+	cout << DC.mean << ", " << DC.sigma << endl;
+	for (int i = 0; i < DC.max; i++)
+	{
+		cout << i << ":\t" << DC.pdf[i] << endl;
+	}
+	cout << endl << endl;
+	DC.gaussianRV();
+	for (int i = 0; i < DC.max; i++)
+	{
+		cout << i << ":\t" << DC.pdf[i] << endl;
+	}
+	cout << endl << endl;
 
 	return 0;
 }

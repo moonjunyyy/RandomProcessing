@@ -1,4 +1,9 @@
 #include "discreteRV.h"
+
+/*
+RV Parent Class
+*/
+
 void discreteRV::init(int num, int low, int high)
 {
 	N = num;
@@ -21,6 +26,10 @@ void discreteRV::calculateExVar()
 	VAR = EX2 - EX * EX;
 }
 
+/*
+Dice RV Class
+*/
+
 void dice::experiment(int Ntrial)
 {
 	for (int i = 0; i < Ntrial; i++)
@@ -39,6 +48,10 @@ void dice::experiment(int Ntrial)
 	}
 	return;
 }
+
+/*
+Binominal RV Class
+*/
 
 void binomial::init(int num, double p)
 {
@@ -83,23 +96,15 @@ void binomial::experiment(int Ntrial)
 	VAR = VAR / (double)Ntrial - EX * EX;
 }
 
-void binomial::calculateExVar()
-{
-	double EX2 = 0.0;
-	EX = 0.0;
-	for (int i = 0; i < N; i++)
-	{
-		EX += pdf[i] * (xlow + i);
-		EX2 += pdf[i] * (xlow + i) * (xlow + i);
-	}
-	VAR = EX2 - EX * EX;
-}
-
 void binomial::calculate()
 {
 	for (int i = 0; i < N; i++) pdf[i] = analyticalBinomial(xhigh, i, p_loss);
 	calculateExVar();
 }
+
+/*
+Poisson Limit Class
+*/
 
 void poisson::init(int num, double p)
 {
@@ -158,4 +163,66 @@ void poisson::calcBinomal()
 {
 	for (int i = 0; i < N; i++) pdf[i] = xbinomial(i, P);
 	calculateExVar();
+}
+
+/*
+Central Limit Class
+*/
+
+void central::init(int num, int low, int high)
+{
+	N = num;
+	xlow = low;
+	xhigh = high;
+	max = xhigh * N + 1;
+	
+	mean = 21. / 6.;
+	sigma = 91. / 6. - mean * mean;
+	mean *= N;
+	sigma = sqrt(N * sigma);
+
+	pdf = new double[max];
+	EX = VAR = 0;
+	for (int i = 0; i < max; i++) pdf[i] = 0.0;
+}
+
+void central::experiment(int Ntrial)
+{
+	for (int t = 0; t < Ntrial; t++)
+	{
+		int x = 0;
+		for (int d = 0; d < N; d++)
+		{
+			x += (rand() % 6 + 1);
+		}
+		pdf[x]++;
+		EX += x;
+		VAR += x * x;
+	}
+	for (int i = 0; i < max; i++) pdf[i] /= (double)Ntrial;
+	EX /= (double)Ntrial;
+	VAR = VAR / (double)Ntrial - EX * EX;
+}
+
+void central::gaussianRV()
+{
+	for (int d = 0; d < max; d++)
+	{
+		pdf[d] = 1 / sqrt(2 * PI * sigma * sigma)
+			* exp(- 1. / (2 * sigma * sigma) * (d - mean) * (d - mean));
+	}
+	calculateExVar();
+}
+
+
+void central::calculateExVar()
+{
+	double EX2 = 0.0;
+	EX = 0.0;
+	for (int i = 0; i < max; i++)
+	{
+		EX += pdf[i] * i;
+		EX2 += pdf[i] * i * i;
+	}
+	VAR = EX2 - EX * EX;
 }
